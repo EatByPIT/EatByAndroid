@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">EatByLogin</string>
+    <string name="nd">Nunca mais deixe \nos alimentos \n esquecidos\n no fundo da \n geladeira. </string>
+    <string name="nd2">Com o Eat By, o \n monitoramento \n da validade dos \n seus produtos \n se torna muito \n mais fácil</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+ <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
+</resources>

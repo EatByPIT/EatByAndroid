@@ -1,10 +1,16 @@
 package com.example.eatbylogin
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
+import androidx.core.app.NotificationCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.eatbylogin.databinding.ActivityFetchingBinding
@@ -16,6 +22,9 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.FirebaseMessaging
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 
 
@@ -64,13 +73,23 @@ class FetchingActivity : AppCompatActivity() {
 
         dbRef = FirebaseDatabase.getInstance().getReference("Employees")
 
+        val currentDate = LocalDate.now()
+
         dbRef.addValueEventListener(object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 empList.clear()
                 if (snapshot.exists()){
                     for (empSnap in snapshot.children){
+
                         val empData = empSnap.getValue(EmployeeModel::class.java)
-                        empList.add(empData!!)
+                        if (empData != null) {
+                            val expirationDate = LocalDate.parse(empData.empED, DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                            if (expirationDate.isBefore(currentDate) || expirationDate.isEqual(currentDate)) {
+                                empData.empProductName?.let { sendNotification(it) }
+                            }
+                            empList.add(empData)
+                        }
+
                     }
                     val mAdapter = EmpAdapter(empList, object : EmpAdapter.onItemClickListener {
                         override fun onItemClick(position: Int) {
@@ -98,6 +117,34 @@ class FetchingActivity : AppCompatActivity() {
         auth = Firebase.auth
 
     }
+
+    private fun sendNotification(productName: String) {
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationId = 1 // Pode ser qualquer valor exclusivo para identificar a notificação
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channelId = "emp_channel"
+            val channelName = "Emp Channel"
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val notificationChannel = NotificationChannel(channelId, channelName, importance)
+            notificationChannel.enableLights(true)
+            notificationChannel.lightColor = Color.RED
+            notificationChannel.enableVibration(true)
+            notificationManager.createNotificationChannel(notificationChannel)
+        }
+
+        val notificationBuilder = NotificationCompat.Builder(this, "emp_channel")
+            .setSmallIcon(R.drawable.logo)
+            .setContentTitle("Atenção!")
+            .setContentText("Seu produto $productName está vencido ou vai vencer em breve.")
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+
+        notificationManager.notify(notificationId, notificationBuilder.build())
+    }
+
+
+
+
 
 
 }

@@ -12,10 +12,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.eatbylogin.databinding.ActivityFetchingBinding
@@ -30,15 +28,13 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
-import androidx.cardview.widget.CardView
+
 
 
 class FetchingActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityFetchingBinding
     private lateinit var auth: FirebaseAuth
-    private lateinit var mAdapter: EmpAdapter
 
     private lateinit var empRecyclerView: RecyclerView
     private lateinit var tvLoadingData: TextView
@@ -60,17 +56,21 @@ class FetchingActivity : AppCompatActivity() {
 
         empList = arrayListOf<EmployeeModel>()
 
-        mAdapter = EmpAdapter(empList, object : EmpAdapter.onItemClickListener {
-            override fun onItemClick(position : Int) {
-                // Implemente a ação do clique do item aqui
+        val mAdapter = EmpAdapter(empList, object : EmpAdapter.onItemClickListener {
+            override fun onItemClick(position: Int) {
+                val intent = Intent(this@FetchingActivity, activity_employee_details::class.java)
+                intent.putExtra("empId", empList[position].empId)
+                intent.putExtra("empName", empList[position].empProductName)
+                intent.putExtra("empAge", empList[position].empED)
+                intent.putExtra("empSalary", empList[position].empDescription)
+                startActivity(intent)
             }
         })
-
-
-
         empRecyclerView.adapter = mAdapter
 
+
         getEmployeesData()
+
     }
 
     private fun getEmployeesData() {
@@ -82,40 +82,33 @@ class FetchingActivity : AppCompatActivity() {
 
         val currentDate = LocalDate.now()
 
-        dbRef.addValueEventListener(object : ValueEventListener {
+        dbRef.addValueEventListener(object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 empList.clear()
-                if (snapshot.exists()) {
-                    for (empSnap in snapshot.children) {
+                if (snapshot.exists()){
+                    for (empSnap in snapshot.children){
+
                         val empData = empSnap.getValue(EmployeeModel::class.java)
                         if (empData != null) {
-                            val dateString = empData.empED
-                            Log.d("DateDebug", "Date String: $dateString")
-
-                            if (!dateString.isNullOrBlank()) {
-                                try {
-                                    val expirationDate = LocalDate.parse(dateString, DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-                                    val currentDate = LocalDate.now()
-                                    if (expirationDate.isBefore(currentDate) || expirationDate.isEqual(currentDate)) {
-                                        empData.empProductName?.let { productName ->
-                                            empData.empId?.let { itemId ->
-                                                sendNotification(productName, itemId)
-                                            }
-                                        }
-                                    }
-
-                                    empList.add(empData)
-                                } catch (e: DateTimeParseException) {
-                                    // Tratar valores de data inválidos aqui
-                                    e.printStackTrace()
-                                }
+                            val expirationDate = LocalDate.parse(empData.empED, DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                            if (expirationDate.isBefore(currentDate) || expirationDate.isEqual(currentDate)) {
+                                empData.empProductName?.let { sendNotification(it) }
                             }
+                            empList.add(empData)
                         }
+
                     }
-
-
-                    // Atualize o RecyclerView aqui
-                    mAdapter.notifyDataSetChanged()
+                    val mAdapter = EmpAdapter(empList, object : EmpAdapter.onItemClickListener {
+                        override fun onItemClick(position: Int) {
+                            val intent = Intent(this@FetchingActivity, activity_employee_details::class.java)
+                            intent.putExtra("empId", empList[position].empId)
+                            intent.putExtra("empName", empList[position].empProductName)
+                            intent.putExtra("empAge", empList[position].empED)
+                            intent.putExtra("empSalary", empList[position].empDescription)
+                            startActivity(intent)
+                        }
+                    })
+                    empRecyclerView.adapter = mAdapter
 
                     empRecyclerView.visibility = View.VISIBLE
                     tvLoadingData.visibility = View.GONE
@@ -123,22 +116,16 @@ class FetchingActivity : AppCompatActivity() {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                // Lidar com o cancelamento da leitura dos dados do Firebase, se necessário
+                TODO("Not yet implemented")
             }
+
         })
-
-
-
 
         auth = Firebase.auth
 
     }
 
-    private fun sendNotification(productName: String, itemId: String) {
-        Log.d("expirationn", "Date String:oi")
-
-
-
+    private fun sendNotification(productName: String) {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val notificationId = 1 // Pode ser qualquer valor exclusivo para identificar a notificação
 
@@ -160,21 +147,6 @@ class FetchingActivity : AppCompatActivity() {
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
         notificationManager.notify(notificationId, notificationBuilder.build())
-
-        // Encontrar o item correspondente na lista e atualizar a cor do card
-        for (item in empList) {
-            Log.d("ListDebug", "Item ID: ${item.empId}, Is Expired: ${item.isExpired}")
-            if (item.empId == itemId) {
-                item.isExpired = true // Supondo que você tenha um atributo "isExpired" no seu modelo
-                break
-            }
-        }
-
-        // Notificar o adapter para atualizar a exibição dos itens
-        mAdapter.notifyDataSetChanged()
-
-        empRecyclerView.adapter?.notifyDataSetChanged()
-
     }
 
 
@@ -185,11 +157,11 @@ class FetchingActivity : AppCompatActivity() {
         private val listener: onItemClickListener
     ) : RecyclerView.Adapter<EmpAdapter.EmpViewHolder>() {
 
-    private val currentDate: LocalDate = LocalDate.now()
+        private val currentDate: LocalDate = LocalDate.now()
 
         inner class EmpViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
             val expirationIndicator = itemView.findViewById<View>(R.id.expirationIndicator)
+            val tvEmpName = itemView.findViewById<TextView>(R.id.tvEmpName) // Esta linha é onde o TextView é referenciado
 
             fun bind(item: EmployeeModel) {
                 val expirationDate = LocalDate.parse(item.empED, DateTimeFormatter.ofPattern("dd/MM/yyyy"))
@@ -203,6 +175,8 @@ class FetchingActivity : AppCompatActivity() {
                     expirationIndicator.visibility = View.GONE
                 }
 
+                // Configure o nome do item aqui
+                tvEmpName.text = item.empProductName // Aqui é onde o texto do TextView é definido como o nome do produto
 
                 // Implemente a lógica do clique do item aqui
                 itemView.setOnClickListener {
@@ -210,6 +184,7 @@ class FetchingActivity : AppCompatActivity() {
                 }
             }
         }
+
 
 
 
@@ -231,7 +206,6 @@ class FetchingActivity : AppCompatActivity() {
             fun onItemClick(position: Int)
         }
     }
-
 
 
 

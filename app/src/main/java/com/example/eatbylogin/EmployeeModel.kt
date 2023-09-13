@@ -5,5 +5,5 @@ data class EmployeeModel (
     var empProductName: String? = null,
     var empED: String? = null,
     var empDescription: String? = null,
-    var isExpired: Boolean
+    var isExpired: Boolean = false
     )

@@ -8,7 +8,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.example.eatbylogin.databinding.ActivityMainBinding
+import com.example.eatbylogin.databinding.ActivityLoginBinding
 import com.example.eatbylogin.databinding.ActivityPrincipalBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth

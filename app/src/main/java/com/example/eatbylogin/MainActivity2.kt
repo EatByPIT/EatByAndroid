@@ -5,19 +5,19 @@ import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.example.eatbylogin.databinding.ActivityCadastroBinding
-import com.example.eatbylogin.databinding.ActivityMain2Binding
+import com.example.eatbylogin.databinding.ActivityMainpageBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
 class MainActivity2 : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMain2Binding
+    private lateinit var binding: ActivityMainpageBinding
     private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMain2Binding.inflate(layoutInflater)
+        binding = ActivityMainpageBinding.inflate(layoutInflater)
 
         window.statusBarColor = Color.parseColor("#547cb2")
 

@@ -13,6 +13,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -25,7 +26,6 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.messaging.FirebaseMessaging
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -40,6 +40,7 @@ class FetchingActivity : AppCompatActivity() {
     private lateinit var tvLoadingData: TextView
     private lateinit var empList: ArrayList<EmployeeModel>
     private lateinit var dbRef: DatabaseReference
+    private lateinit var mAdapter: EmpAdapter // Mova a declaração aqui
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,7 +48,7 @@ class FetchingActivity : AppCompatActivity() {
         val view = binding.root
         setContentView(view)
 
-        val firebase : DatabaseReference = FirebaseDatabase.getInstance().getReference()
+        val firebase: DatabaseReference = FirebaseDatabase.getInstance().getReference()
 
         empRecyclerView = findViewById(R.id.empRecyclerView)
         empRecyclerView.layoutManager = LinearLayoutManager(this)
@@ -56,7 +57,7 @@ class FetchingActivity : AppCompatActivity() {
 
         empList = arrayListOf<EmployeeModel>()
 
-        val mAdapter = EmpAdapter(empList, object : EmpAdapter.onItemClickListener {
+        mAdapter = EmpAdapter(empList, object : EmpAdapter.onItemClickListener {
             override fun onItemClick(position: Int) {
                 val intent = Intent(this@FetchingActivity, activity_employee_details::class.java)
                 intent.putExtra("empId", empList[position].empId)
@@ -66,11 +67,9 @@ class FetchingActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         })
+
         empRecyclerView.adapter = mAdapter
-
-
         getEmployeesData()
-
     }
 
     private fun getEmployeesData() {
@@ -82,12 +81,11 @@ class FetchingActivity : AppCompatActivity() {
 
         val currentDate = LocalDate.now()
 
-        dbRef.addValueEventListener(object : ValueEventListener{
+        dbRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 empList.clear()
-                if (snapshot.exists()){
-                    for (empSnap in snapshot.children){
-
+                if (snapshot.exists()) {
+                    for (empSnap in snapshot.children) {
                         val empData = empSnap.getValue(EmployeeModel::class.java)
                         if (empData != null) {
                             val expirationDate = LocalDate.parse(empData.empED, DateTimeFormatter.ofPattern("dd/MM/yyyy"))
@@ -96,6 +94,22 @@ class FetchingActivity : AppCompatActivity() {
                             }
                             empList.add(empData)
                         }
+
+
+                        mAdapter.notifyDataSetChanged()
+
+                        empRecyclerView.visibility = View.VISIBLE
+                        tvLoadingData.visibility = View.GONE
+
+                        // Verifique o tamanho da lista após preencher
+                        if (empList.size >= 10) {
+                            val intent = Intent(this@FetchingActivity, Premium_Signature::class.java)
+                            startActivity(intent)
+                            finish()
+                        }
+
+
+
 
                     }
                     val mAdapter = EmpAdapter(empList, object : EmpAdapter.onItemClickListener {
@@ -141,7 +155,7 @@ class FetchingActivity : AppCompatActivity() {
         }
 
         val notificationBuilder = NotificationCompat.Builder(this, "emp_channel")
-            .setSmallIcon(R.drawable.logo)
+            .setSmallIcon(R.drawable.logo_circle)
             .setContentTitle("Atenção!")
             .setContentText("Seu produto $productName está vencido ou vai vencer em breve.")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)

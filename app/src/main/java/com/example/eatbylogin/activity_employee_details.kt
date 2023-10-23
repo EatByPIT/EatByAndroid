@@ -1,6 +1,7 @@
 package com.example.eatbylogin
 
 import android.content.Intent
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
@@ -27,6 +28,8 @@ class activity_employee_details : AppCompatActivity() {
     private lateinit var btnDelete: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        window.statusBarColor = Color.parseColor("#1E1E1E")
+
         super.onCreate(savedInstanceState)
         binding = ActivityEmployeeDetailsBinding.inflate(layoutInflater)
         val view = binding.root

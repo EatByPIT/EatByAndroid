@@ -19,7 +19,7 @@ class MainActivity2 : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainpageBinding.inflate(layoutInflater)
 
-        window.statusBarColor = Color.parseColor("#547cb2")
+        window.statusBarColor = Color.parseColor("#1E1E1E")
 
         val view = binding.root
         setContentView(view)

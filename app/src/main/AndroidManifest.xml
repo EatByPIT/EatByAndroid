@@ -16,6 +16,9 @@
         android:theme="@style/Theme.EatByLogin"
         tools:targetApi="31">
         <activity
+            android:name=".Premium_Signature"
+            android:exported="false" />
+        <activity
             android:name=".activity_employee_details"
             android:exported="false" />
         <activity
@@ -53,27 +56,22 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
-
-
-        <!-- Set custom default icon. This is used when no icon is set for incoming notification messages.
-     See README(https://goo.gl/l4GJaQ) for more. -->
+        <!--
+ Set custom default icon. This is used when no icon is set for incoming notification messages.
+     See README(https://goo.gl/l4GJaQ) for more.
+        -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@drawable/logo" />
-
+            android:resource="@drawable/logo_circle" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/yw" />
-
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="@string/default_notification_channel_id" />
-
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
-
     </application>
 
 </manifest>

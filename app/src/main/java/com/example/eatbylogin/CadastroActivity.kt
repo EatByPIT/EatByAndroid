@@ -20,7 +20,7 @@ class CadastroActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        window.statusBarColor = Color.parseColor("#FFFCF6")
+        window.statusBarColor = Color.parseColor("#1E1E1E")
 
         binding = ActivityCadastroBinding.inflate(layoutInflater)
 

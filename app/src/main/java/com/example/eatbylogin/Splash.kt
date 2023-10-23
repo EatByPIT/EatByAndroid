@@ -12,7 +12,7 @@ class Splash : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         supportActionBar?.hide()
-        window.statusBarColor = Color.parseColor("#5E8BC8")
+        window.statusBarColor = Color.parseColor("#FFDC62")
 
         Handler(Looper.getMainLooper()).postDelayed({
             val intent = Intent(this,

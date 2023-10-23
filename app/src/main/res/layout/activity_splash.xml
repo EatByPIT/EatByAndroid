@@ -4,31 +4,46 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#5E8BC8"
+    android:background="#1E1E1E"
     tools:context=".Splash">
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="50dp"
+    <View
+        android:id="@+id/view3"
+        android:layout_width="410dp"
+        android:layout_height="241dp"
+        android:layout_marginEnd="1dp"
+        android:background="@drawable/rounded_splash_view"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/logo" />
+        app:layout_constraintVertical_bias="0.0" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.336"
+        app:srcCompat="@drawable/logo_circle" />
 
     <TextView
         android:id="@+id/textView13"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="180dp"
         android:fontFamily="@font/montserrat_extrabold"
-        android:text="Eat By"
-        android:textColor="@color/white"
+        android:text="Eat By."
+        android:textColor="#1E1E1E"
         android:textSize="75dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/view3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.382" />
 </androidx.constraintlayout.widget.ConstraintLayout>

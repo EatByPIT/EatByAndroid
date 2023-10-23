@@ -46,7 +46,6 @@ class PrincipalActivity : AppCompatActivity() {
             when(it.itemId){
 
                 R.id.home -> replaceFragment(Home())
-                R.id.delete -> replaceFragment(Delete())
                 R.id.logout -> replaceFragment(Logout())
 
                 else ->{
@@ -63,7 +62,7 @@ class PrincipalActivity : AppCompatActivity() {
 
 
 
-        window.statusBarColor = Color.parseColor("#5E8BC8")
+        window.statusBarColor = Color.parseColor("#1E1E1E")
 
         val view = binding.root
         setContentView(view)

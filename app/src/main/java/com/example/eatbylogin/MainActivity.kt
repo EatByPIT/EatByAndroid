@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        window.statusBarColor = Color.parseColor("#FFDC62")
+        window.statusBarColor = Color.parseColor("#1E1E1E")
 
         binding = ActivityLoginBinding.inflate(layoutInflater)
 

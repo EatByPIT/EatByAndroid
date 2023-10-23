@@ -1,5 +1,7 @@
 package com.example.eatbylogin
 
+import android.content.Intent
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
@@ -7,8 +9,11 @@ import android.text.TextWatcher
 import android.widget.Toast
 import com.example.eatbylogin.databinding.ActivityInsertBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import java.util.Calendar
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -21,6 +26,8 @@ class InsertActivity : AppCompatActivity() {
     private val empList: MutableList<EmployeeModel> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        window.statusBarColor = Color.parseColor("#1E1E1E")
+
         super.onCreate(savedInstanceState)
         binding = ActivityInsertBinding.inflate(layoutInflater)
         val view = binding.root
@@ -78,43 +85,50 @@ class InsertActivity : AppCompatActivity() {
 
         if (empProductName.isEmpty()) {
             binding.etEmpName.error = "Please enter product name"
+            return
         }
         if (empED.isEmpty()) {
             binding.etEmpAge.error = "Please enter expiration date"
+            return
         }
         if (empSalary.isEmpty()) {
             binding.etEmpSalary.error = "Please enter description"
-        }
-
-        // Verificar se já existem 10 itens no RecyclerView
-        if (empList.size >= 10) {
-            Toast.makeText(this, "You can't add more than 10 items", Toast.LENGTH_LONG).show()
             return
         }
 
-        // Se não houver 10 itens, continuar com a adição do novo item
-        val empId = dbRef.push().key!!
-        val employee = EmployeeModel(empId, empProductName, empED, empSalary)
+        // Verificar se já existem 10 itens no Firebase
+        dbRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.childrenCount >= 10) {
+                    Toast.makeText(this@InsertActivity, "You can't add more than 10 items", Toast.LENGTH_LONG).show()
+                    val intent = Intent(this@InsertActivity, Premium_Signature::class.java)
+                    startActivity(intent)
+                    finish()
+                } else {
+                    // Se não houver 10 itens, continuar com a adição do novo item
+                    val empId = dbRef.push().key!!
+                    val employee = EmployeeModel(empId, empProductName, empED, empSalary)
 
-        dbRef.child(empId).setValue(employee)
-            .addOnCompleteListener {
-                Toast.makeText(this, "Data inserted successfully", Toast.LENGTH_LONG).show()
+                    dbRef.child(empId).setValue(employee)
+                        .addOnCompleteListener {
+                            Toast.makeText(this@InsertActivity, "Data inserted successfully", Toast.LENGTH_LONG).show()
 
-                binding.etEmpName.text.clear()
-                binding.etEmpAge.text.clear()
-                binding.etEmpSalary.text.clear()
-
-                // Atualizar a lista de itens no RecyclerView
-                empList.add(employee)
+                            binding.etEmpName.text.clear()
+                            binding.etEmpAge.text.clear()
+                            binding.etEmpSalary.text.clear()
+                        }
+                        .addOnFailureListener { err ->
+                            Toast.makeText(this@InsertActivity, "Error ${err.message}", Toast.LENGTH_LONG).show()
+                        }
+                }
             }
-            .addOnFailureListener { err ->
-                Toast.makeText(this, "Error ${err.message}", Toast.LENGTH_LONG).show()
 
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(this@InsertActivity, "Error: ${error.message}", Toast.LENGTH_LONG).show()
             }
-    //
-
-
+        })
     }
+
 
 
 }

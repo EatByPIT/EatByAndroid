@@ -6,11 +6,7 @@
         android:icon="@drawable/round_home_24"
         android:title="Home" />
     <item
-        android:id="@+id/delete"
-        android:icon="@drawable/round_delete_forever_24"
-        android:title="Delete" />
-    <item
         android:id="@+id/logout"
-        android:icon="@drawable/round_logout_24"
-        android:title="Logout" />
+        android:icon="@drawable/round_account_circle_24"
+        android:title="Profile" />
 </menu>
